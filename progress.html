@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Progress Table</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    table {
+      border-collapse: collapse;
+      font-size: 14px;
+      width: 100%;
+      margin: 20px 0;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    .section-header {
+      background-color: #b0cbea;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .progress-bar-container {
+      background-color: #eee;
+      border-radius: 5px;
+      height: 20px;
+      width: 100%;
+      position: relative;
+    }
+
+    .progress-bar {
+      background-color: #4CAF50;
+      height: 100%;
+      border-radius: 5px;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .checkmark {
+      font-size: 18px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <table id="taskTable" border="1" cellpadding="5">
+    <tr>
+      <!-- <th>Project Ref</th> -->
+      <th>Task</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Progress</th>
+      <th>Complete</th>
+    </tr>   
+  </table>
+
+  <script>
+const params = new URLSearchParams(window.location.search);
+const PROJECT_REF =
+  params.get("ref") ||
+  (typeof window.__PROGRESS_REF__ !== "undefined" ? window.__PROGRESS_REF__ : null);
+    //const PROJECT_REF = "PGRM3267-Well";
+
+    fetch('https://aerialsurveysnz.github.io/Project_management_Data/Project_Plan_Data.csv') 
+    //fetch('Data/Project_Plan_Data.csv')
+      .then(r => r.text())
+      .then(text => {
+        const lines = text.trim().split(/\r?\n/);
+        const headers = lines.shift().split(',').map(h => h.trim().toLowerCase());
+        const col = Object.fromEntries(headers.map((h,i)=>[h,i]));
+
+        const table = document.getElementById('taskTable');
+
+        lines.forEach(line => {
+          if (!line.trim()) return;
+          const cells = line.split(',').map(c => c.trim());
+
+          const ref = cells[col.projectref];
+          if (ref !== PROJECT_REF) return;  // 🔑 show only rows matching PRJ-2025-001
+
+          const task = cells[col.task];
+          const start = cells[col.start];
+          const end   = cells[col.end];
+          const progress = parseInt(cells[col.progress] || 0, 10);
+          const complete = (cells[col.complete] || '').toLowerCase() === 'true';
+
+          const row = table.insertRow();
+          //row.insertCell().textContent = ref;
+          row.insertCell().textContent = task;
+          row.insertCell().textContent = start;
+          row.insertCell().textContent = end;
+          row.insertCell().innerHTML = `
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width:${progress}%;">${progress}%</div>
+            </div>`;
+          row.insertCell().innerHTML = complete ? '<span class="checkmark">&#10004;</span>' : '';
+        });
+      });
+  </script>
+</body>
+</html>
