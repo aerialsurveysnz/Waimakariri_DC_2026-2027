@@ -17,8 +17,8 @@
                 "SN_No": "Waimakariri DC",
                 "Company_Name": "SN14581",
                 "Description": "Waimakariri Urban (Oxford) 2026/27 ortho imagery",
-                "Area": 0,
-                "Percentage_Coverage": 0.0
+                "Area": 90.60,
+                "Percentage_Coverage": 100.0
             },
             "geometry": {
                 "type": "MultiPolygon",
